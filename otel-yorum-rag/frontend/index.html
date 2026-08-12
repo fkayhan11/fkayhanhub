@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guest Relations Terminal — Yorum Yanıtlama Sistemi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ============================== ÜST BAR ============================== -->
+  <header class="topbar">
+    <div class="topbar__brand">
+      <span class="topbar__mark">◆</span>
+      <span class="topbar__title">GUEST&nbsp;RELATIONS&nbsp;TERMINAL</span>
+    </div>
+    <div class="topbar__meta">
+      <div class="status-pill" id="statusPill">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">BAĞLANIYOR</span>
+      </div>
+      <div class="topbar__model" id="modelBadge">MODEL: —</div>
+    </div>
+  </header>
+
+  <!-- ============================== ANA GÖVDE ============================== -->
+  <main class="workspace">
+
+    <!-- SOL PANEL: Gelen yorum girişi -->
+    <section class="panel panel--input" aria-labelledby="inputPanelTitle">
+      <div class="panel__header">
+        <h2 id="inputPanelTitle" class="panel__title">
+          <span class="panel__index">01</span> Gelen Yorumu Yapıştır
+        </h2>
+        <span class="panel__subtitle">Ham misafir yorumunu aşağıya girin</span>
+      </div>
+
+      <textarea
+        id="reviewInput"
+        class="review-textarea"
+        placeholder="Örn: 'Odamız çok temizdi fakat kahvaltı çeşitleri sınırlıydı...'"
+        maxlength="4000"
+      ></textarea>
+
+      <div class="input-footer">
+        <span class="char-counter"><span id="charCount">0</span> / 4000</span>
+        <button id="generateBtn" class="btn btn--primary">
+          <span class="btn__label">Yanıt Üret</span>
+          <span class="btn__spinner" id="btnSpinner" hidden></span>
+        </button>
+      </div>
+
+      <div id="errorBox" class="error-box" hidden></div>
+    </section>
+
+    <!-- SAĞ PANEL: Referanslar + Üretilen cevap -->
+    <section class="panel panel--output" aria-labelledby="outputPanelTitle">
+
+      <div class="panel__header">
+        <h2 id="outputPanelTitle" class="panel__title">
+          <span class="panel__index">02</span> Referans Alınan Yorumlar
+        </h2>
+        <span class="panel__subtitle">RAG — En benzer 1 kayıt (TF-IDF / Cosine)</span>
+      </div>
+
+      <div id="referencesList" class="references-list">
+        <div class="empty-state">
+          <span class="empty-state__icon">▤</span>
+          <p>Henüz bir sorgu çalıştırılmadı.<br />Sol panelden bir yorum girip
+            <strong>“Yanıt Üret”</strong> butonuna basın.</p>
+        </div>
+      </div>
+
+      <div class="panel__header panel__header--divider">
+        <h2 class="panel__title">
+          <span class="panel__index">03</span> Üretilen Yapay Zeka Cevabı
+        </h2>
+      </div>
+
+      <div class="ai-response-box" id="aiResponseBox">
+        <div class="empty-state empty-state--small">
+          <span class="empty-state__icon">✎</span>
+          <p>Üretilen kurumsal yanıt burada görünecek.</p>
+        </div>
+      </div>
+
+      <button id="copyBtn" class="btn btn--ghost" hidden>
+        <span id="copyBtnLabel">Panoya Kopyala</span>
+      </button>
+
+    </section>
+  </main>
+
+  <footer class="footer-bar">
+    <span>RAG Engine · TF-IDF Retrieval · Rate Limit: 15 RPM</span>
+    <span id="clock"></span>
+  </footer>
+
+  <!-- ============================== MODAL ============================== -->
+  <div id="nameModal" class="modal" hidden>
+    <div class="modal__content">
+      <h3 class="modal__title">Misafire Nasıl Hitap Edelim?</h3>
+      <p class="modal__desc">Lütfen misafire hitap şeklini tam olarak girin (Örn: Değerli Ayşe Hanım,). Boş bırakırsanız "Değerli Misafirimiz," olarak hitap edilecektir.</p>
+      <input type="text" id="guestNameInput" class="modal__input" placeholder="Örn: Değerli Ayşe Hanım," />
+      <div class="modal__actions">
+        <button id="modalCancelBtn" class="btn btn--ghost" style="margin-top:0;">İptal</button>
+        <button id="modalConfirmBtn" class="btn btn--primary">Tamam</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

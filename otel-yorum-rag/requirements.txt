@@ -1,0 +1,24 @@
+# ============================================================
+# RAG Tabanlı Otomatik Yorum Cevaplama Sistemi - Bağımlılıklar
+# Kurulum: pip install -r requirements.txt
+# ============================================================
+
+# --- Web Scraping Katmanı ---
+selenium==4.27.1
+webdriver-manager==4.0.2
+pandas==2.2.3
+openpyxl==3.1.5          # Excel (.xlsx) dışa aktarım için
+
+# --- Backend / API Katmanı ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+python-dotenv==1.0.1
+python-multipart==0.0.20
+
+# --- Yapay Zeka / RAG Katmanı ---
+# NOT: Eski "google-generativeai" paketi kullanımdan kaldırılmıştır (deprecated).
+# Güncel resmi Google SDK'sı "google-genai" paketidir.
+google-genai==1.5.0
+scikit-learn==1.6.0      # TF-IDF + Cosine Similarity
+numpy==2.2.1

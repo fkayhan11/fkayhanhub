@@ -1,0 +1,507 @@
+/* ============================================================================
+   DESIGN TOKENS
+   Konsept: "Guest Relations Terminal" — bir finansal ticker / bloomberg
+   terminali estetiğini otel misafir ilişkileri baglamina uyarlar.
+   Renk paleti: grafit/lacivert zemin + hafif altin (gold) vurgu (otel/hospitality
+   hissi verir, klise "acid green" ya da "terracotta" paletlerinden kaçınılmıştır).
+============================================================================ */
+:root {
+  /* Zemin katmanları */
+  --bg-0: #0a0d13;        /* en dış zemin */
+  --bg-1: #10141d;        /* panel zemini */
+  --bg-2: #161b26;        /* panel içi kart zemini */
+  --bg-3: #1d2331;        /* hover / elevated */
+
+  /* Kenarlıklar */
+  --border-subtle: #232a3a;
+  --border-strong: #2f3850;
+
+  /* Metin */
+  --text-primary: #e9ecf4;
+  --text-secondary: #8b93a9;
+  --text-tertiary: #5a6278;
+
+  /* Vurgu — hafif altın/amber (hospitality + terminal ticker hissi) */
+  --accent: #c9a227;
+  --accent-strong: #e0b93a;
+  --accent-dim: rgba(201, 162, 39, 0.12);
+
+  /* Durum renkleri */
+  --positive: #3ecf8e;
+  --negative: #e2685f;
+  --neutral: #6c7a94;
+
+  /* Tipografi */
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius-sm: 3px;
+  --radius-md: 6px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg-0);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+::selection { background: var(--accent-dim); color: var(--accent-strong); }
+
+/* ============================================================================
+   ÜST BAR
+============================================================================ */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-1);
+  flex-shrink: 0;
+}
+
+.topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-size: 14px;
+}
+
+.topbar__mark { color: var(--accent); font-size: 16px; }
+
+.topbar__meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--neutral);
+  box-shadow: 0 0 0 0 rgba(0,0,0,0);
+  transition: background 0.2s ease;
+}
+.status-dot.is-live {
+  background: var(--positive);
+  animation: pulse 1.8s infinite;
+}
+.status-dot.is-error { background: var(--negative); }
+
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(62, 207, 142, 0.5); }
+  70%  { box-shadow: 0 0 0 6px rgba(62, 207, 142, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(62, 207, 142, 0); }
+}
+
+.topbar__model {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  border: 1px solid var(--border-subtle);
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+/* ============================================================================
+   ANA ÇALIŞMA ALANI — İKİ PANEL
+============================================================================ */
+.workspace {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--border-subtle);
+  overflow: hidden;
+}
+
+.panel {
+  background: var(--bg-1);
+  padding: 26px 30px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.panel__header {
+  margin-bottom: 16px;
+}
+.panel__header--divider {
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.panel__title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.panel__index {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--accent);
+  border: 1px solid var(--border-strong);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.panel__subtitle {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+/* ============================================================================
+   SOL PANEL — INPUT
+============================================================================ */
+.review-textarea {
+  flex: 1;
+  min-height: 260px;
+  resize: vertical;
+  background: var(--bg-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  line-height: 1.6;
+  padding: 16px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.review-textarea::placeholder { color: var(--text-tertiary); }
+.review-textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+.input-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+
+.char-counter {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-tertiary);
+}
+
+/* ============================================================================
+   BUTONLAR
+============================================================================ */
+.btn {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 11px 22px;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.08s ease, filter 0.15s ease, opacity 0.15s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn--primary {
+  background: var(--accent);
+  color: #14110a;
+}
+.btn--primary:hover:not(:disabled) { filter: brightness(1.08); }
+
+.btn--ghost {
+  display: none !important;
+}
+
+.btn__spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(20,17,10,0.35);
+  border-top-color: #14110a;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-box {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: rgba(226, 104, 95, 0.1);
+  border: 1px solid rgba(226, 104, 95, 0.35);
+  color: #f0a49d;
+  font-size: 13px;
+  border-radius: var(--radius-md);
+  line-height: 1.5;
+}
+
+/* ============================================================================
+   SAĞ PANEL — REFERANSLAR
+============================================================================ */
+.references-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.reference-card {
+  background: var(--bg-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 13px 15px;
+}
+
+.reference-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.reference-card__tags {
+  display: flex;
+  gap: 6px;
+}
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 20px;
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+.tag--positive { color: var(--positive); border-color: rgba(62,207,142,0.35); }
+.tag--negative { color: var(--negative); border-color: rgba(226,104,95,0.35); }
+.tag--notr, .tag--nötr { color: var(--neutral); }
+
+/* Terminal-tarzı benzerlik skoru göstergesi (imza öğesi) */
+.similarity-meter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+}
+.similarity-meter__bar {
+  width: 54px;
+  height: 5px;
+  background: var(--bg-3);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.similarity-meter__fill {
+  height: 100%;
+  background: var(--accent);
+}
+
+.reference-card__review {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0 0 8px 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.reference-card__answer {
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.55;
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border-subtle);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+.reference-card__answer-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-tertiary);
+  display: block;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================================================
+   AI CEVAP KUTUSU
+============================================================================ */
+.ai-response-box {
+  background: linear-gradient(180deg, var(--bg-2), var(--bg-1));
+  border: 1px solid var(--border-strong);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  font-size: 14.5px;
+  line-height: 1.7;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  min-height: 90px;
+  height: auto !important;
+  display: block;
+  margin-bottom: 20px;
+}
+
+/* ============================================================================
+   BOŞ DURUM
+============================================================================ */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  color: var(--text-tertiary);
+  padding: 30px 10px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.empty-state--small { padding: 14px 10px; }
+.empty-state__icon { font-size: 20px; color: var(--border-strong); }
+.empty-state strong { color: var(--text-secondary); }
+
+/* ============================================================================
+   ALT BİLGİ ÇUBUĞU
+============================================================================ */
+.footer-bar {
+  display: flex;
+  justify-content: space-between;
+  padding: 9px 28px;
+  border-top: 1px solid var(--border-subtle);
+  background: var(--bg-1);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-tertiary);
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   RESPONSIVE
+============================================================================ */
+@media (max-width: 860px) {
+  .workspace { grid-template-columns: 1fr; }
+  .topbar { padding: 12px 16px; }
+  .panel { padding: 20px 18px; }
+}
+
+/* Erişilebilirlik: klavye odak halkası her yerde görünür kalsın */
+a:focus-visible,
+button:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Kullanıcı hareket azaltmayı tercih ediyorsa animasyonları kıs */
+@media (prefers-reduced-motion: reduce) {
+  .status-dot.is-live { animation: none; }
+}
+
+/* ============================================================================
+   MODAL
+============================================================================ */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(10, 13, 19, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal[hidden] {
+  display: none !important;
+}
+.modal__content {
+  background: var(--bg-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 24px 30px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  animation: slideUp 0.2s ease-out forwards;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.modal__title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  margin: 0 0 10px 0;
+  color: var(--accent);
+}
+.modal__desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+}
+.modal__input {
+  width: 100%;
+  background: var(--bg-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 10px 12px;
+  margin-bottom: 20px;
+  outline: none;
+}
+.modal__input:focus {
+  border-color: var(--accent);
+}
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}

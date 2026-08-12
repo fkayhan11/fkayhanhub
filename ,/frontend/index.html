@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Relations AI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Guest Relations AI</h1>
+            <p>Yapay Zeka Destekli Kurumsal Yanıt Sistemi</p>
+        </header>
+        
+        <main>
+            <div class="input-section">
+                <label for="reviewInput">Yeni Misafir Yorumu</label>
+                <textarea id="reviewInput" placeholder="Misafirin yorumunu buraya yapıştırın..."></textarea>
+                <button id="generateBtn">Yanıt Oluştur</button>
+            </div>
+
+            <div class="output-section">
+                <label>Üretilen AI Yanıtı</label>
+                <div id="loading" class="hidden">Yapay zeka geçmiş verileri analiz ediyor...</div>
+                <div id="aiResponse" class="response-box">Sistem yanıt bekliyor.</div>
+                <button id="copyBtn" class="secondary-btn">Panoya Kopyala</button>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

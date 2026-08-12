@@ -1,0 +1,27 @@
+[
+    {
+        "keywords": ["yemek", "restoran", "lezzet", "soğuk", "çeşit", "aç"],
+        "category": "Yiyecek ve İçecek (Negatif/Geliştirilebilir)",
+        "template": "{guest_name},\n\nDeğerli vaktinizi ayırıp görüşlerinizi bizimle paylaştığınız için teşekkür ederiz. Restoranımızdaki yemek çeşitliliği ve sıcaklık standartları konusunda yaşadığınız deneyimden dolayı üzgünüz. Asteria Family Resort Belek olarak gastronomi standartlarımızı her zaman en üst seviyede tutmayı hedefleriz. Mutfak şefimiz ve yiyecek-içecek ekibimizle yorumlarınızı detaylıca paylaştık; gerekli iyileştirmeler derhal yapılacaktır. Umarız sizi tekrar ağırlayarak telafi etme fırsatı buluruz.\n\nSaygılarımızla,\nAsteria Hotels Ekibi"
+    },
+    {
+        "keywords": ["harika", "mükemmel", "yemek", "animasyon", "personel", "güler yüzlü", "iyi"],
+        "category": "Genel Memnuniyet (Pozitif)",
+        "template": "{guest_name},\n\nTesisimizde geçirdiğiniz tatilden memnun ayrılmanız bizi çok mutlu etti! Değerli yorumunuz ve övgüleriniz için Asteria Family Resort Belek ekibi adına içtenlikle teşekkür ederiz. Özellikle personelimiz ve sunduğumuz hizmetlerden memnun kalmanız, bizim için en büyük motivasyon kaynağıdır. Sizi ve sevdiklerinizi en kısa sürede yeniden ağırlamaktan büyük bir mutluluk duyacağız.\n\nSaygılarımızla,\nAsteria Hotels Ekibi"
+    },
+    {
+        "keywords": ["oda", "temizlik", "kirli", "havlu", "çarşaf", "banyo"],
+        "category": "Odalar ve Temizlik (Negatif)",
+        "template": "{guest_name},\n\nTatiliniz sırasında odanızın temizliği ile ilgili yaşadığınız olumsuzluklar için içtenlikle özür dileriz. Asteria Family Resort Belek olarak hijyen ve temizlik standartlarımız konusunda son derece hassasız. Geri bildiriminiz Kat Hizmetleri (Housekeeping) yöneticilerimize doğrudan iletilmiş olup, benzer durumların tekrar yaşanmaması için gerekli uyarılar ve eğitimler planlanmıştır. Deneyiminizi düzeltmek için sizi gelecekte tekrar misafirimiz olarak görmeyi çok isteriz.\n\nSaygılarımızla,\nAsteria Hotels Ekibi"
+    },
+    {
+        "keywords": ["havuz", "deniz", "şezlong", "plaj", "kalabalık", "yer yok"],
+        "category": "Havuz ve Plaj (Negatif/Kalabalık)",
+        "template": "{guest_name},\n\nGeri bildiriminiz için teşekkür ederiz. Havuz ve plaj alanımızdaki şezlong kapasitesiyle ilgili yaşadığınız zorluktan ötürü üzgünüz. Yüksek sezonda oluşan yoğunluğu daha iyi yönetebilmek ve her misafirimize konforlu bir alan sunabilmek adına ilgili departmanımızla yeni düzenlemeler üzerinde çalışıyoruz. Asteria Family Resort Belek olarak görüşlerinizi çok önemsiyoruz. Umarız bir sonraki ziyaretinizde her şeyin kusursuz olduğunu görebilirsiniz.\n\nSaygılarımızla,\nAsteria Hotels Ekibi"
+    },
+    {
+        "keywords": ["animasyon", "eğlence", "çocuk", "mini club", "çocuk kulübü", "aktivite"],
+        "category": "Çocuk ve Eğlence (Pozitif)",
+        "template": "{guest_name},\n\nYorumunuz için çok teşekkür ederiz! Özellikle çocuk kulübümüz ve animasyon ekibimizle ilgili güzel sözleriniz bizi çok sevindirdi. Asteria Family Resort Belek olarak ailelerin ve minik misafirlerimizin burada unutulmaz, neşe dolu anılar biriktirmesi bizim en büyük gayemizdir. Çocuklarınızın eğlendiğini bilmek bize gurur veriyor. Sizi ve güzel ailenizi yeniden tesisimizde görmek dileğiyle.\n\nSaygılarımızla,\nAsteria Hotels Ekibi"
+    }
+]

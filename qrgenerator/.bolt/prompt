@@ -1,0 +1,30 @@
+A complete, end-to-end QR code generation application that allows users to create customizable QR codes from text/links or uploaded images.
+
+Key Features:
+1. QR Code Types:
+   - Link / Text input: Directly encode URLs or plain text into a QR code
+   - Image upload: Upload an image, upload it to Supabase Storage, and encode the public image URL into a dynamic QR code that redirects to the image
+
+2. Customization Options:
+   - Color picker for QR foreground and background colors
+   - Size slider (128px to 512px)
+   - Margin/padding selector
+   - Error correction level (Low, Medium, Quartile, High)
+   - Real-time live preview of the QR code as settings change
+
+3. Download & Export:
+   - PNG download
+   - SVG download
+   - Copy to clipboard
+   - Shareable link for uploaded image QR codes
+
+4. History / Saved QR Codes:
+   - Save generated QR codes to Supabase database
+   - View list of previously generated QR codes with thumbnails, type tags, creation date, and download buttons
+   - Delete saved QR codes
+
+5. Design & UX:
+   - Clean, modern, responsive UI with dark/light mode accents
+   - Tabbed interface switching between "Link/Metin" and "Resim Yükle"
+   - Loading states, error alerts, and copy-success toasts
+   - Fully translated / titled in Turkish (QR Kod Stüdyosu)

@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geliştirici Portalı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* App (Light) Theme Variables */
+            --app-bg: #f8fafc;
+            --app-surface: #ffffff;
+            --app-text: #0f172a;
+            --app-text-muted: #64748b;
+            --app-border: #e2e8f0;
+            --app-primary: #3b82f6;
+            --app-pink: #ec4899;
+            --app-success: #10b981;
+            
+            /* Hub (Dark Glassmorphism) Theme Variables */
+            --hub-bg: #05050a;
+            --hub-text: #ffffff;
+            --hub-text-muted: #9ca3af;
+            --hub-card-bg: rgba(255, 255, 255, 0.03);
+            --hub-card-border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            /* Defaults to Hub theme */
+            background-color: var(--hub-bg);
+            color: var(--hub-text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        body.app-mode {
+            background-color: var(--app-bg);
+            color: var(--app-text);
+        }
+
+        /* --- HUB BACKGROUND ORBS --- */
+        .background-orbs {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            transition: opacity 0.4s ease;
+        }
+        body.app-mode .background-orbs { opacity: 0; pointer-events: none; }
+        
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: float 20s infinite ease-in-out;
+        }
+        .orb-1 { width: 400px; height: 400px; background: radial-gradient(circle, #8b5cf6, transparent 70%); top: -100px; left: -100px; }
+        .orb-2 { width: 500px; height: 500px; background: radial-gradient(circle, #3b82f6, transparent 70%); bottom: -150px; right: -100px; animation-delay: -5s; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            33% { transform: translate(50px, -50px); }
+            66% { transform: translate(-30px, 50px); }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 2rem;
+            z-index: 1;
+        }
+
+        /* View Management */
+        .view { display: none; animation: fadeIn 0.4s ease; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* =========================================================
+           HUB VIEW (Dark Glassmorphism)
+           ========================================================= */
+        #view-hub .hub-header { text-align: center; margin-bottom: 4rem; }
+        #view-hub .logo {
+            display: inline-flex; align-items: center; gap: 0.75rem;
+            font-size: 1.5rem; font-weight: 700; letter-spacing: 2px;
+            margin-bottom: 1rem; color: var(--hub-text);
+        }
+        #view-hub .logo i { color: var(--app-primary); }
+        #view-hub .subtitle { color: var(--hub-text-muted); font-size: 1.1rem; font-weight: 300; }
+
+        #view-hub .grid-container {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;
+        }
+        
+        @media (min-width: 768px) {
+            .card-span-2 { grid-column: span 2; }
+        }
+
+        .hub-card {
+            position: relative;
+            background: var(--hub-card-bg);
+            border: 1px solid var(--hub-card-border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-decoration: none;
+            color: inherit;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        .hub-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-glow {
+            position: absolute; width: 250px; height: 250px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent 60%);
+            border-radius: 50%; pointer-events: none; opacity: 0;
+            transition: opacity 0.3s; transform: translate(-50%, -50%); z-index: 0;
+        }
+        .hub-card:hover .card-glow { opacity: 1; }
+
+        .hub-card .card-content { position: relative; z-index: 1; display: flex; flex-direction: column; flex-grow: 1; }
+        
+        .hub-card .icon-wrapper {
+            width: 48px; height: 48px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        #card-excel .icon-wrapper { color: var(--app-primary); }
+        #card-excel:hover .icon-wrapper { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+        
+        #card-yorum .icon-wrapper { color: var(--app-pink); }
+        #card-yorum:hover .icon-wrapper { background: rgba(236, 72, 153, 0.15); color: #f472b6; }
+        
+        #card-qr .icon-wrapper { color: var(--app-success); }
+        #card-qr:hover .icon-wrapper { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+
+        .hub-card h3 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; }
+        .hub-card p { color: var(--hub-text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 2rem; flex-grow: 1; }
+
+        /* =========================================================
+           APP VIEWS (Light, Clean, White)
+           ========================================================= */
+        .app-view-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .btn-back {
+            background: transparent; border: none; color: var(--app-text-muted);
+            font-size: 1rem; font-weight: 500; cursor: pointer;
+            display: flex; align-items: center; gap: 0.5rem;
+            margin-bottom: 2rem; transition: color 0.2s;
+        }
+        .btn-back:hover { color: var(--app-text); }
+        
+        .app-header { margin-bottom: 2rem; }
+        .app-title-light { font-size: 1.75rem; font-weight: 700; color: var(--app-text); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;}
+        .app-title-light.excel-title i { color: var(--app-primary); }
+        .app-title-light.yorum-title i { color: var(--app-pink); }
+        .app-desc-light { color: var(--app-text-muted); font-size: 0.95rem; line-height: 1.5; }
+
+        .app-box {
+            background: var(--app-surface);
+            border: 1px solid var(--app-border);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--app-text); }
+        
+        .form-control {
+            width: 100%; padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db; border-radius: 8px;
+            font-size: 0.95rem; background: #f9fafb; color: var(--app-text);
+            transition: all 0.2s;
+        }
+        .form-control:focus {
+            outline: none; background: #fff; border-color: var(--app-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+        #form-yorum .form-control:focus {
+            border-color: var(--app-pink);
+            box-shadow: 0 0 0 3px rgba(219, 39, 119, 0.15);
+        }
+        
+        /* Custom Select Styling */
+        select.form-control {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.2em;
+            padding-right: 2.5rem;
+            cursor: pointer;
+        }
+
+        textarea.form-control { resize: vertical; min-height: 120px; }
+
+        .btn-submit {
+            width: 100%; padding: 0.875rem; border: none; border-radius: 8px;
+            color: white; font-weight: 600; font-size: 1rem; cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            display: flex; justify-content: center; align-items: center; gap: 0.5rem;
+        }
+        .btn-submit:active { transform: scale(0.98); }
+        .btn-blue { background: var(--app-primary); } .btn-blue:hover { background: #1d4ed8; }
+        .btn-pink { background: var(--app-pink); } .btn-pink:hover { background: #be185d; }
+
+        .result-box {
+            margin-top: 1.5rem; padding: 1.25rem; border-radius: 8px; display: none;
+            font-size: 0.95rem; line-height: 1.5;
+        }
+        .result-success { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+        .result-error { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+        .result-success strong { color: #047857; }
+        .result-error strong { color: #b91c1c; }
+
+        .loader {
+            display: none; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%; border-top-color: white; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        /* --- DRAG & DROP UI --- */
+        .drop-zone {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 2.5rem 1rem;
+            text-align: center;
+            background: #f8fafc;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        .drop-zone.dragover {
+            background: #eff6ff;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .drop-zone i { font-size: 2.5rem; margin-bottom: 1rem; color: #94a3b8; }
+        .drop-zone.dragover i { color: var(--primary); }
+        .drop-zone-text { font-weight: 500; font-size: 0.95rem; }
+        .drop-zone-hint { font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.7; }
+        
+        #file-input { display: none; }
+        #preview-img { max-width: 100%; max-height: 150px; border-radius: 8px; margin-top: 1rem; display: none; margin-left: auto; margin-right: auto;}
+        
+        .btn-download {
+            background: var(--app-success);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            transition: background 0.2s;
+        }
+        .btn-download:hover { background: #059669; }
+    </style>
+</head>
+<body>
+    
+    <div class="background-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+
+    <div class="container">
+        
+        <!-- ==============================================
+             HUB VIEW (Dark Glassmorphism)
+             ============================================== -->
+        <div id="view-hub" class="view active">
+            <header class="hub-header">
+                <div class="logo">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>DEVHUB // Furkan</span>
+                </div>
+                <p class="subtitle">Tüm Uygulamaların Tek Bir Merkezde</p>
+            </header>
+
+            <main class="grid-container">
+                <div id="card-fiscograph" class="hub-card card-span-2" onclick="window.open('https://fiscograph.vercel.app', '_blank')" style="min-height: 225px; display: flex; justify-content: center;">
+                    <div class="card-glow"></div>
+                    <div class="card-content" style="flex-direction: row; align-items: center; gap: 0.5rem; justify-content: flex-start; margin-top: auto; margin-bottom: auto;">
+                        <img src="fiscograph_logo_tr.png?v=3" alt="Fiscograph Logo" style="height: 110px; object-fit: contain; opacity: 0.4; margin-left: -1.5rem;">
+                        <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <h3 style="font-size: 2.2rem; font-family: 'Inter', sans-serif; font-weight: 800; letter-spacing: -1px; margin-bottom: 0.2rem; background: linear-gradient(to right, #fff, #9ca3af); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Fiscograph</h3>
+                            <p style="font-size: 1rem; margin: 0; color: #cbd5e1; white-space: nowrap;">Yeni nesil finans ve grafik otomasyon platformuna hemen geçiş yap.</p>
+                        </div>
+                        <div style="margin-left: auto; color: #cbd5e1; font-size: 1.5rem; padding-left: 1rem;">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="card-excel" class="hub-card" onclick="switchView('view-excel', true)">
+                    <div class="card-glow"></div>
+                    <div class="card-content">
+                        <div class="icon-wrapper"><i class="fa-solid fa-file-excel"></i></div>
+                        <h3>Excel OCR Otomasyonu</h3>
+                        <p>Görsellerden ve raporlardan Swift & Python altyapısı ile otomatik tablo çıkarma ve Excel'e aktarma.</p>
+                    </div>
+                </div>
+
+                <div id="card-yorum" class="hub-card" onclick="switchView('view-yorum', true)">
+                    <div class="card-glow"></div>
+                    <div class="card-content">
+                        <div class="icon-wrapper"><i class="fa-solid fa-comments"></i></div>
+                        <h3>Yorum RAG Sistemi</h3>
+                        <p>Yapay zeka destekli müşteri yorum analizi, duygu çıkarımı ve kurumsal dilde otomatik yanıt üretimi.</p>
+                    </div>
+                </div>
+
+                <div id="card-qr" class="hub-card" onclick="switchView('view-qr', true)">
+                    <div class="card-glow"></div>
+                    <div class="card-content">
+                        <div class="icon-wrapper"><i class="fa-solid fa-qrcode"></i></div>
+                        <h3>QR Kod Stüdyosu</h3>
+                        <p>Özelleştirilebilir, logolu ve marka kimliğine uygun dinamik QR kodları oluşturun ve indirin.</p>
+                    </div>
+                </div>
+
+                <div id="card-md" class="hub-card" onclick="switchView('view-md', true)">
+                    <div class="card-glow"></div>
+                    <div class="card-content">
+                        <div class="icon-wrapper" style="color: var(--app-primary);"><i class="fa-brands fa-markdown"></i></div>
+                        <h3>Markdown Dönüştürücü</h3>
+                        <p>Word (.docx) dosyalarını veya ham metinleri saniyeler içinde şık Markdown formatına çevirin.</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- ==============================================
+             EXCEL APP VIEW (Light, Clean)
+             ============================================== -->
+        <div id="view-excel" class="view">
+            <div class="app-view-container">
+                <button class="btn-back" onclick="switchView('view-hub', false)">
+                    <i class="fa-solid fa-arrow-left"></i> Portala Dön
+                </button>
+                
+                <div class="app-header">
+                    <h1 class="app-title-light excel-title"><i class="fa-solid fa-file-excel"></i> Excel OCR Otomasyonu</h1>
+                    <p class="app-desc-light">Görselin yolunu girin, sistem saniyeler içinde formatlı Excel dosyasına dönüştürsün.</p>
+                </div>
+                
+                <div class="app-box">
+                    <form id="form-excel">
+                        <!-- DRAG AND DROP ZONE -->
+                        <div class="drop-zone" id="drop-zone">
+                            <i class="fa-solid fa-cloud-arrow-up" id="drop-icon"></i>
+                            <div class="drop-zone-text" id="drop-text">Görseli Buraya Sürükle veya Seç</div>
+                            <div class="drop-zone-hint">PNG, JPG formatları desteklenir</div>
+                            <img id="preview-img" src="" alt="Önizleme">
+                            <input type="file" id="file-input" accept="image/png, image/jpeg">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Hedef Excel Dosyası Adı</label>
+                            <input type="text" id="excel-target" class="form-control" placeholder="Örn: aylik_rapor" required>
+                        </div>
+                        <button type="submit" class="btn-submit btn-blue" id="btn-excel">
+                            <span class="loader" id="loader-excel"></span>
+                            <span id="text-excel">Dönüştür <i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                        </button>
+                    </form>
+                    <div id="result-excel" class="result-box"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==============================================
+             YORUM APP VIEW (Light, Clean)
+             ============================================== -->
+        <div id="view-yorum" class="view">
+            <div class="app-view-container">
+                <button class="btn-back" onclick="switchView('view-hub', false)">
+                    <i class="fa-solid fa-arrow-left"></i> Portala Dön
+                </button>
+                
+                <div class="app-header" style="display: flex; align-items: center; gap: 15px;">
+                    <img src="logo_cropped.png" alt="Asteria Logo" style="height: 60px; object-fit: contain;">
+                    <div>
+                        <h1 class="app-title-light yorum-title" style="margin-bottom: 2px;">Asteria Family Resort Belek</h1>
+                        <p class="app-desc-light" style="margin: 0;">Akıllı Misafir İlişkileri & Yorum RAG Otomasyonu</p>
+                    </div>
+                </div>
+                
+                <div class="app-box">
+                    <form id="form-yorum">
+                        <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+                            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                                <label class="form-label">Misafir Hitap</label>
+                                <input type="text" id="yorum-guest" class="form-control" value="Değerli Misafirimiz" required>
+                            </div>
+                            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                                <label class="form-label">Yanıt Dili</label>
+                                <select id="yorum-lang" class="form-control" onchange="translateSalutation()">
+                                    <option value="tr">Türkçe</option>
+                                    <option value="en">İngilizce</option>
+                                    <option value="de">Almanca</option>
+                                    <option value="ru">Rusça</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Misafir Yorumu</label>
+                            <textarea id="yorum-text" class="form-control" style="min-height: 150px;" placeholder="Misafirin bıraktığı yorumu buraya yapıştırın..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn-submit btn-pink" id="btn-yorum">
+                            <span class="loader" id="loader-yorum"></span>
+                            <span id="text-yorum">Profesyonel Yanıt Üret <i class="fa-solid fa-pen-nib"></i></span>
+                        </button>
+                    </form>
+                    <div id="result-yorum" class="result-box"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR OLUŞTURUCU GÖRÜNÜMÜ -->
+        <div id="view-qr" class="view" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9999; background: #fff; margin: 0; padding: 0;">
+            <button onclick="switchView('view-hub', false)" style="position: absolute; top: 20px; left: 20px; z-index: 10000; background: rgba(0,0,0,0.5); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; backdrop-filter: blur(5px); display: flex; align-items: center; gap: 8px; font-weight: 500; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.7)'" onmouseout="this.style.background='rgba(0,0,0,0.5)'">
+                <i class="fa-solid fa-arrow-left"></i> Portala Dön
+            </button>
+            <iframe src="http://localhost:5005/qr" style="width: 100%; height: 100%; border: none; display: block;"></iframe>
+        </div>
+
+        <!-- ==============================================
+             MARKDOWN APP VIEW
+             ============================================== -->
+        <div id="view-md" class="view">
+            <div class="app-view-container">
+                <button class="btn-back" onclick="switchView('view-hub', false)">
+                    <i class="fa-solid fa-arrow-left"></i> Portala Dön
+                </button>
+                
+                <div class="app-header">
+                    <h1 class="app-title-light"><i class="fa-brands fa-markdown" style="color: var(--app-primary);"></i> Markdown Dönüştürücü</h1>
+                    <p class="app-desc-light">Word (.docx) dosyasını sürükleyin veya kopyaladığınız metni yapıştırın.</p>
+                </div>
+                
+                <div class="app-box">
+                    <form id="form-md">
+                        <div class="drop-zone" id="drop-zone-md" style="margin-bottom: 1.5rem;">
+                            <i class="fa-solid fa-file-word" id="drop-icon-md"></i>
+                            <div class="drop-zone-text" id="drop-text-md">Word (.docx) Dosyasını Buraya Sürükle veya Seç</div>
+                            <input type="file" id="file-input-md" accept=".docx">
+                        </div>
+                        
+                        <div style="text-align: center; margin-bottom: 1.5rem; color: #9ca3af; font-size: 0.9rem; font-weight: 600;">— VEYA —</div>
+
+                        <div class="form-group">
+                            <label class="form-label">Ham Metin (Yapay Zeka ile Biçimlendirilecek)</label>
+                            <textarea id="md-text" class="form-control" style="min-height: 120px;" placeholder="Dönüştürülecek karmaşık veya formatsız metni buraya yapıştırın..."></textarea>
+                        </div>
+                        <button type="submit" class="btn-submit btn-blue" id="btn-md">
+                            <span class="loader" id="loader-md"></span>
+                            <span id="text-md">Markdown'a Çevir <i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                        </button>
+                    </form>
+                    <div id="result-md" class="result-box"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Mouse glow effect for hub cards
+        document.querySelectorAll('.hub-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const glow = card.querySelector('.card-glow');
+                if (glow) {
+                    glow.style.left = `${e.clientX - rect.left}px`;
+                    glow.style.top = `${e.clientY - rect.top}px`;
+                }
+            });
+        });
+
+        // View Navigation and Theme Switching
+        function switchView(viewId, isAppMode) {
+            // Toggle body class for background color switch
+            if (isAppMode) {
+                document.body.classList.add('app-mode');
+            } else {
+                document.body.classList.remove('app-mode');
+            }
+
+            // Switch views
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            
+            // Clear results when switching
+            document.getElementById('result-excel').style.display = 'none';
+            document.getElementById('result-yorum').style.display = 'none';
+        }
+
+        // Drag & Drop Logic
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const previewImg = document.getElementById('preview-img');
+        const dropIcon = document.getElementById('drop-icon');
+        const dropText = document.getElementById('drop-text');
+        let selectedBase64 = null;
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Lütfen sadece görsel (PNG, JPG) yükleyin.');
+                return;
+            }
+            
+            // Generate a default target name based on filename
+            const defaultTarget = file.name.replace(/\.[^/.]+$/, "");
+            document.getElementById('excel-target').value = defaultTarget;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                selectedBase64 = e.target.result;
+                previewImg.src = selectedBase64;
+                previewImg.style.display = 'block';
+                dropIcon.style.display = 'none';
+                dropText.textContent = file.name;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Excel API Call (Sync with Download)
+        document.getElementById('form-excel').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!selectedBase64) {
+                alert('Lütfen bir görsel seçin veya sürükleyip bırakın.');
+                return;
+            }
+
+            const btnText = document.getElementById('text-excel');
+            const loader = document.getElementById('loader-excel');
+            const resultBox = document.getElementById('result-excel');
+            
+            btnText.style.display = 'none';
+            loader.style.display = 'block';
+            resultBox.style.display = 'none';
+
+            try {
+                let targetName = document.getElementById('excel-target').value;
+                if (!targetName.endsWith('.xlsx')) {
+                    targetName += '.xlsx';
+                }
+
+                // Using convert_sync to wait for processing and get the file
+                const response = await fetch('http://localhost:5005/convert_sync', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image_base64: selectedBase64,
+                        target_xlsx: targetName,
+                        sheet_name: "Sayfa1",
+                        append_rows: false
+                    })
+                });
+                const data = await response.json();
+                
+                resultBox.style.display = 'block';
+                if (response.ok && data.status === 'success') {
+                    resultBox.className = 'result-box result-success';
+                    resultBox.innerHTML = `
+                        <strong><i class="fa-solid fa-check"></i> Başarılı!</strong> 
+                        <br>Excel dosyanız hazırlandı. Hemen aşağıdan indirebilirsiniz.
+                        <br><br>
+                        <a href="http://localhost:5005/download/${encodeURIComponent(targetName)}" class="btn-download" download>
+                            <i class="fa-solid fa-download"></i> İndir (${targetName})
+                        </a>
+                    `;
+                } else {
+                    throw new Error(data.message || 'Hata oluştu');
+                }
+            } catch (err) {
+                resultBox.style.display = 'block';
+                resultBox.className = 'result-box result-error';
+                resultBox.innerHTML = `<strong><i class="fa-solid fa-circle-exclamation"></i> Hata:</strong> İşlem başarısız. Excel sunucusunun (5005 Portu) çalıştığından emin olun. Hata detayı: ${err.message}`;
+            } finally {
+                btnText.style.display = 'block';
+                loader.style.display = 'none';
+            }
+        });
+
+        // Yorum API Call
+        document.getElementById('form-yorum').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnText = document.getElementById('text-yorum');
+            const loader = document.getElementById('loader-yorum');
+            const resultBox = document.getElementById('result-yorum');
+            
+            btnText.style.display = 'none';
+            loader.style.display = 'inline-block';
+            resultBox.style.display = 'none';
+
+            try {
+                const payload = {
+                    guest_name: document.getElementById('yorum-guest').value,
+                    language: document.getElementById('yorum-lang').value,
+                    review_text: document.getElementById('yorum-text').value
+                };
+
+                const response = await fetch('http://localhost:5005/reply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                
+                resultBox.style.display = 'block';
+                if (data.status === 'success') {
+                    let sentimentBadge = '';
+                    if (data.sentiment) {
+                        const s = data.sentiment.toLowerCase();
+                        if (s.includes('pozitif')) {
+                            sentimentBadge = `<span style="margin-left: 10px; font-size: 11px; padding: 3px 8px; border-radius: 12px; background: #ecfdf5; color: #059669; border: 1px solid #10b981;"><i class="fa-solid fa-face-smile"></i> Pozitif Yorum</span>`;
+                        } else if (s.includes('negatif')) {
+                            sentimentBadge = `<span style="margin-left: 10px; font-size: 11px; padding: 3px 8px; border-radius: 12px; background: #fef2f2; color: #dc2626; border: 1px solid #ef4444;"><i class="fa-solid fa-face-frown"></i> Negatif Yorum</span>`;
+                        } else {
+                            sentimentBadge = `<span style="margin-left: 10px; font-size: 11px; padding: 3px 8px; border-radius: 12px; background: #f3f4f6; color: #4b5563; border: 1px solid #9ca3af;"><i class="fa-solid fa-face-meh"></i> Nötr Yorum</span>`;
+                        }
+                    }
+
+                    resultBox.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
+                            <h4 style="margin:0; color: var(--app-text); font-size: 16px; display: flex; align-items: center;">AI Yanıtı ${sentimentBadge}</h4>
+                            <div style="display: flex; gap: 10px;">
+                                <button onclick="retryYorum()" class="btn-back" style="margin:0; padding: 5px 12px; background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid #fca5a5; transition: all 0.3s ease;">
+                                    <i class="fa-solid fa-arrows-rotate"></i> Beğenmedim
+                                </button>
+                                <button onclick="shortenYorum()" class="btn-back" style="margin:0; padding: 5px 12px; background: rgba(245,158,11,0.1); color: #f59e0b; border: 1px solid #fcd34d; transition: all 0.3s ease;">
+                                    <i class="fa-solid fa-compress"></i> Kısalt
+                                </button>
+                                <button onclick="copyReply(this, '${data.reply.replace(/'/g, "\\'").replace(/\n/g, "\\n")}')" class="btn-back" style="margin:0; padding: 5px 12px; background: rgba(0,0,0,0.05); color: var(--app-text); transition: all 0.3s ease;">
+                                    <i class="fa-solid fa-copy"></i> Kopyala
+                                </button>
+                            </div>
+                        </div>
+                        <p style="margin:0; white-space: pre-wrap; font-size: 14px; line-height: 1.6; color: #4b5563;">${data.reply}</p>
+                    `;
+                } else {
+                    resultBox.innerHTML = `<span style="color:var(--app-danger)"><i class="fa-solid fa-circle-exclamation"></i> Hata: ${data.error || 'Bilinmeyen Hata'}</span>`;
+                }
+            } catch (err) {
+                resultBox.style.display = 'block';
+                resultBox.className = 'result-box result-error';
+                resultBox.innerHTML = `<strong><i class="fa-solid fa-circle-exclamation"></i> Hata:</strong> İşlem başarısız. Hata detayı: ${err.message}`;
+            } finally {
+                btnText.style.display = 'block';
+                loader.style.display = 'none';
+            }
+        });
+
+        async function retryYorum() {
+            const btnText = document.getElementById('text-yorum');
+            const loader = document.getElementById('loader-yorum');
+            const resultBox = document.getElementById('result-yorum');
+            
+            // UI'ı yükleniyor moduna al
+            const oldContent = resultBox.innerHTML;
+            resultBox.innerHTML = `<div style="text-align:center; padding: 20px;"><i class="fa-solid fa-arrows-rotate fa-spin" style="font-size: 24px; color: var(--app-primary);"></i><p style="margin-top: 10px; color: #64748b;">Daha farklı bir yanıt üretiliyor...</p></div>`;
+            btnText.style.display = 'none';
+            loader.style.display = 'inline-block';
+
+            try {
+                const payload = {
+                    guest_name: document.getElementById('yorum-guest').value,
+                    language: document.getElementById('yorum-lang').value,
+                    review_text: document.getElementById('yorum-text').value,
+                    retry: true
+                };
+
+                const response = await fetch('http://localhost:5005/reply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    let sentimentBadge = '';
+                    if (data.sentiment) {
+                        const s = data.sentiment.toLowerCase();
+                        if (s.includes('pozitif')) {
+                            sentimentBadge = `<span style="margin-left: 10px; font-size: 11px; padding: 3px 8px; border-radius: 12px; background: #ecfdf5; color: #059669; border: 1px solid #10b981;"><i class="fa-solid fa-face-smile"></i> Pozitif Yorum</span>`;
+                        } else if (s.includes('negatif')) {
+                            sentimentBadge = `<span style="margin-left: 10px; font-size: 11px; padding: 3px 8px; border-radius: 12px; background: #fef2f2; color: #dc2626; border: 1px solid #ef4444;"><i class="fa-solid fa-face-frown"></i> Negatif Yorum</span>`;
+                        } else {
+                            sentimentBadge = `<span style="margin-left: 10px; font-size: 11px; padding: 3px 8px; border-radius: 12px; background: #f3f4f6; color: #4b5563; border: 1px solid #9ca3af;"><i class="fa-solid fa-face-meh"></i> Nötr Yorum</span>`;
+                        }
+                    }
+
+                    resultBox.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
+                            <h4 style="margin:0; color: var(--app-text); font-size: 16px; display: flex; align-items: center;">Alternatif AI Yanıtı ${sentimentBadge}</h4>
+                            <div style="display: flex; gap: 10px;">
+                                <button onclick="retryYorum()" class="btn-back" style="margin:0; padding: 5px 12px; background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid #fca5a5; transition: all 0.3s ease;">
+                                    <i class="fa-solid fa-arrows-rotate"></i> Beğenmedim
+                                </button>
+                                <button onclick="shortenYorum()" class="btn-back" style="margin:0; padding: 5px 12px; background: rgba(245,158,11,0.1); color: #f59e0b; border: 1px solid #fcd34d; transition: all 0.3s ease;">
+                                    <i class="fa-solid fa-compress"></i> Kısalt
+                                </button>
+                                <button onclick="copyReply(this, '${data.reply.replace(/'/g, "\\'").replace(/\n/g, "\\n")}')" class="btn-back" style="margin:0; padding: 5px 12px; background: rgba(0,0,0,0.05); color: var(--app-text); transition: all 0.3s ease;">
+                                    <i class="fa-solid fa-copy"></i> Kopyala
+                                </button>
+                            </div>
+                        </div>
+                        <p style="margin:0; white-space: pre-wrap; font-size: 14px; line-height: 1.6; color: #4b5563;">${data.reply}</p>
+                    `;
+                } else {
+                    resultBox.innerHTML = `<span style="color:var(--app-danger)"><i class="fa-solid fa-circle-exclamation"></i> Hata: ${data.error || 'Bilinmeyen Hata'}</span>`;
+                }
+            } catch (err) {
+                resultBox.innerHTML = oldContent;
+                alert('Yeniden üretme başarısız: ' + err.message);
+            } finally {
+                btnText.style.display = 'block';
+                loader.style.display = 'none';
+            }
+        }
+
+        async function shortenYorum() {
+            const btnText = document.getElementById('text-yorum');
+            const loader = document.getElementById('loader-yorum');
+            const resultBox = document.getElementById('result-yorum');
+            
+            // UI'ı yükleniyor moduna al
+            const oldContent = resultBox.innerHTML;
+            resultBox.innerHTML = `<div style="text-align:center; padding: 20px;"><i class="fa-solid fa-compress fa-spin" style="font-size: 24px; color: #f59e0b;"></i><p style="margin-top: 10px; color: #64748b;">Yanıt daha kısa ve öz hale getiriliyor...</p></div>`;
+            btnText.style.display = 'none';
+            loader.style.display = 'inline-block';
+
+            try {
+                const payload = {
+                    guest_name: document.getElementById('yorum-guest').value,
+                    language: document.getElementById('yorum-lang').value,
+                    review_text: document.getElementById('yorum-text').value,
+                    shorten: true
+                };
+
+                const response = await fetch('http://localhost:5005/reply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    let sentimentBadge = '';
+                    if (data.sentiment) {
+                        const s = data.sentiment.toLowerCase();
+                        if (s.includes('pozitif')) {
+                            sentimentBadge = `<span style="margin-left: 10px; font-size: 11px; padding: 3px 8px; border-radius: 12px; background: #ecfdf5; color: #059669; border: 1px solid #10b981;"><i class="fa-solid fa-face-smile"></i> Pozitif Yorum</span>`;
+                        } else if (s.includes('negatif')) {
+                            sentimentBadge = `<span style="margin-left: 10px; font-size: 11px; padding: 3px 8px; border-radius: 12px; background: #fef2f2; color: #dc2626; border: 1px solid #ef4444;"><i class="fa-solid fa-face-frown"></i> Negatif Yorum</span>`;
+                        } else {
+                            sentimentBadge = `<span style="margin-left: 10px; font-size: 11px; padding: 3px 8px; border-radius: 12px; background: #f3f4f6; color: #4b5563; border: 1px solid #9ca3af;"><i class="fa-solid fa-face-meh"></i> Nötr Yorum</span>`;
+                        }
+                    }
+
+                    resultBox.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
+                            <h4 style="margin:0; color: var(--app-text); font-size: 16px; display: flex; align-items: center;">Kısa AI Yanıtı ${sentimentBadge}</h4>
+                            <div style="display: flex; gap: 10px;">
+                                <button onclick="retryYorum()" class="btn-back" style="margin:0; padding: 5px 12px; background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid #fca5a5; transition: all 0.3s ease;">
+                                    <i class="fa-solid fa-arrows-rotate"></i> Beğenmedim
+                                </button>
+                                <button onclick="shortenYorum()" class="btn-back" style="margin:0; padding: 5px 12px; background: rgba(245,158,11,0.1); color: #f59e0b; border: 1px solid #fcd34d; transition: all 0.3s ease;">
+                                    <i class="fa-solid fa-compress"></i> Kısalt
+                                </button>
+                                <button onclick="copyReply(this, '${data.reply.replace(/'/g, "\\'").replace(/\n/g, "\\n")}')" class="btn-back" style="margin:0; padding: 5px 12px; background: rgba(0,0,0,0.05); color: var(--app-text); transition: all 0.3s ease;">
+                                    <i class="fa-solid fa-copy"></i> Kopyala
+                                </button>
+                            </div>
+                        </div>
+                        <p style="margin:0; white-space: pre-wrap; font-size: 14px; line-height: 1.6; color: #4b5563;">${data.reply}</p>
+                    `;
+                } else {
+                    resultBox.innerHTML = `<span style="color:var(--app-danger)"><i class="fa-solid fa-circle-exclamation"></i> Hata: ${data.error || 'Bilinmeyen Hata'}</span>`;
+                }
+            } catch (err) {
+                resultBox.innerHTML = oldContent;
+                alert('Kısaltma işlemi başarısız: ' + err.message);
+            } finally {
+                btnText.style.display = 'block';
+                loader.style.display = 'none';
+            }
+        }
+
+        // Auto-translate salutation based on selected language
+        const defaultSalutations = {
+            'tr': 'Değerli Misafirimiz',
+            'en': 'Dear Guest',
+            'de': 'Sehr geehrter Gast',
+            'ru': 'Уважаемый гость'
+        };
+
+        function translateSalutation() {
+            const guestInput = document.getElementById('yorum-guest');
+            const lang = document.getElementById('yorum-lang').value;
+            
+            // Sadece eğer mevcut metin varsayılan hitaplardan biriyse otomatik değiştir.
+            // Kullanıcı özel bir isim (örneğin "Sayın Ahmet Bey") yazdıysa dokunma!
+            const currentVal = guestInput.value.trim();
+            const isDefault = Object.values(defaultSalutations).includes(currentVal);
+            
+            if (isDefault) {
+                guestInput.value = defaultSalutations[lang];
+            }
+        }
+
+        // Copy button with feedback
+        function copyReply(btn, text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalHtml = btn.innerHTML;
+                const originalColor = btn.style.color;
+                
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Kopyalandı';
+                btn.style.color = '#10b981'; // Green
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                    btn.style.color = originalColor;
+                }, 2000);
+            });
+        }
+        
+        // Download Markdown File
+        function downloadMarkdown(text) {
+            let fileName = prompt("İndirilecek dosyanın adını girin (Örn: asteria_notlar):", "belge");
+            if (!fileName) return; // Kullanıcı iptal ederse işlem sonlanır
+            
+            // Eğer .md uzantısı yazmamışsa otomatik ekle
+            if (!fileName.toLowerCase().endsWith('.md')) {
+                fileName += '.md';
+            }
+
+            const blob = new Blob([text], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        // Markdown File Drop Zone Logic
+        const dropZoneMd = document.getElementById('drop-zone-md');
+        const fileInputMd = document.getElementById('file-input-md');
+        const dropIconMd = document.getElementById('drop-icon-md');
+        const dropTextMd = document.getElementById('drop-text-md');
+        let selectedDocxBase64 = null;
+
+        dropZoneMd.addEventListener('click', () => fileInputMd.click());
+        dropZoneMd.addEventListener('dragover', e => { e.preventDefault(); dropZoneMd.style.borderColor = 'var(--app-primary)'; dropZoneMd.style.background = '#eff6ff'; });
+        dropZoneMd.addEventListener('dragleave', e => { e.preventDefault(); dropZoneMd.style.borderColor = 'var(--app-border)'; dropZoneMd.style.background = '#f9fafb'; });
+        dropZoneMd.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZoneMd.style.borderColor = 'var(--app-border)';
+            dropZoneMd.style.background = '#f9fafb';
+            if(e.dataTransfer.files.length) handleDocxFile(e.dataTransfer.files[0]);
+        });
+        fileInputMd.addEventListener('change', e => {
+            if(e.target.files.length) handleDocxFile(e.target.files[0]);
+        });
+
+        function handleDocxFile(file) {
+            if (!file.name.endsWith('.docx')) {
+                alert('Lütfen sadece .docx (Word) dosyası yükleyin!');
+                return;
+            }
+            dropTextMd.innerText = file.name;
+            dropIconMd.className = 'fa-solid fa-file-circle-check';
+            dropIconMd.style.color = '#10b981';
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                selectedDocxBase64 = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Markdown API Call
+        document.getElementById('form-md').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnText = document.getElementById('text-md');
+            const loader = document.getElementById('loader-md');
+            const resultBox = document.getElementById('result-md');
+            const rawText = document.getElementById('md-text').value;
+            
+            if (!selectedDocxBase64 && !rawText.trim()) {
+                alert('Lütfen ya bir Word dosyası yükleyin ya da metin kutusuna yazı yapıştırın!');
+                return;
+            }
+            
+            btnText.style.display = 'none';
+            loader.style.display = 'inline-block';
+            resultBox.style.display = 'none';
+
+            try {
+                const payload = {
+                    docx_base64: selectedDocxBase64,
+                    text: rawText
+                };
+
+                const response = await fetch('http://localhost:5005/convert-md', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                
+                resultBox.style.display = 'block';
+                if (data.status === 'success') {
+                    resultBox.innerHTML = `
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
+                            <h4 style="margin:0; color: var(--app-text); font-size: 16px;">Oluşturulan Markdown:</h4>
+                            <div style="display: flex; gap: 10px;">
+                                <button type="button" onclick="downloadMarkdown('${data.markdown.replace(/'/g, "\\'").replace(/\n/g, "\\n")}')" class="btn-back" style="margin:0; padding: 5px 12px; background: rgba(59,130,246,0.1); color: #3b82f6; border: 1px solid #93c5fd; transition: all 0.3s ease;">
+                                    <i class="fa-solid fa-download"></i> İndir (.md)
+                                </button>
+                                <button type="button" onclick="copyReply(this, '${data.markdown.replace(/'/g, "\\'").replace(/\n/g, "\\n")}')" class="btn-back" style="margin:0; padding: 5px 12px; background: rgba(0,0,0,0.05); color: var(--app-text); transition: all 0.3s ease;">
+                                    <i class="fa-solid fa-copy"></i> Kopyala
+                                </button>
+                            </div>
+                        </div>
+                        <pre style="margin:0; white-space: pre-wrap; font-size: 13px; line-height: 1.5; color: #4b5563; background: #f1f5f9; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; max-height: 400px; overflow-y: auto;"><code>${data.markdown.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>
+                    `;
+                } else {
+                    resultBox.innerHTML = `<span style="color:var(--app-danger)"><i class="fa-solid fa-circle-exclamation"></i> Hata: ${data.error || 'Bilinmeyen Hata'}</span>`;
+                }
+            } catch (err) {
+                resultBox.style.display = 'block';
+                resultBox.className = 'result-box result-error';
+                resultBox.innerHTML = `<strong><i class="fa-solid fa-circle-exclamation"></i> Hata:</strong> İşlem başarısız. Hata detayı: ${err.message}`;
+            } finally {
+                btnText.style.display = 'block';
+                loader.style.display = 'none';
+            }
+        });
+
+    </script>
+</body>
+</html>

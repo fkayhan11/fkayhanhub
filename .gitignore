@@ -1,0 +1,16 @@
+__pycache__/
+*.xlsx
+*.png
+!portal/*.png
+*.json
+!corporate_responses.json
+!qrgenerator/package.json
+!qrgenerator/package-lock.json
+*.docx
+.env
+qrgenerator/node_modules/
+*test*.py
+bg_remover*.py
+*.applescript
+ocr
+ocr.swift
