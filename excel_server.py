@@ -190,16 +190,9 @@ class ExcelServerHandler(BaseHTTPRequestHandler):
                 img_enh.save(enhanced_path)
                 
                 def query_daemon(path):
-                    self.server.ocr_process.stdin.write(path + "\n")
-                    self.server.ocr_process.stdin.flush()
-                    lines = []
-                    while True:
-                        line = self.server.ocr_process.stdout.readline().strip()
-                        if line == "---END-OF-JSON---" or not line: break
-                        lines.append(line)
-                    ocr_json_str = "".join(lines)
-                    if ocr_json_str.startswith("Error:"): raise Exception(ocr_json_str)
-                    return json.loads(ocr_json_str)
+                    handler_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tesseract_ocr_handler.py")
+                    res = subprocess.run(["python3", handler_script, path], capture_output=True, text=True)
+                    return json.loads(res.stdout)
                     
                 raw1 = query_daemon(unenhanced_path)
                 raw2 = query_daemon(enhanced_path)
@@ -282,41 +275,41 @@ class ExcelServerHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
 def run_server():
-    server_address = ('127.0.0.1', 5005)
+    port = int(os.environ.get("PORT", 5005))
+    server_address = ('0.0.0.0', port)
     
-    # Start Swift OCR daemon
-    ocr_bin = "/Users/furkanmacbook/Desktop/Excel/ocr"
-    if not os.path.exists(ocr_bin):
-        ocr_bin = "./ocr"
-        
-    print("Starting resident Swift OCR process...")
-    ocr_process = subprocess.Popen(
-        [ocr_bin, "--daemon"],
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        text=True
-    )
+    # Start Swift OCR daemon (Disabled for Cloud Compatibility)
+    # ocr_bin = "/Users/furkanmacbook/Desktop/Excel/ocr"
+    # if not os.path.exists(ocr_bin):
+    #    ocr_bin = "./ocr"
+    # print("Starting resident Swift OCR process...")
+    # ocr_process = subprocess.Popen(
+    #    [ocr_bin, "--daemon"],
+    #    stdin=subprocess.PIPE,
+    #    stdout=subprocess.PIPE,
+    #    text=True
+    # )
     
     # Read initialization line
-    init_line = ocr_process.stdout.readline().strip()
-    print(f"Swift OCR process initialized: {init_line}")
+    # init_line = ocr_process.stdout.readline().strip()
+    # print(f"Swift OCR process initialized: {init_line}")
     
     httpd = HTTPServer(server_address, ExcelServerHandler)
-    httpd.ocr_process = ocr_process
+    # httpd.ocr_process = ocr_process
     httpd.should_shutdown = False
     httpd.wb_cache = {}
     
-    print("Excel Persistent Server running on http://127.0.0.1:5005")
+    print(f"Excel Persistent Server running on port {port}")
     
     # Custom loop to handle shutdown smoothly
     while not httpd.should_shutdown:
         httpd.handle_request()
         
     print("Shutting down Excel Persistent Server...")
-    ocr_process.stdin.write("EXIT\n")
-    ocr_process.stdin.flush()
-    ocr_process.terminate()
-    ocr_process.wait()
+    # ocr_process.stdin.write("EXIT\n")
+    # ocr_process.stdin.flush()
+    # ocr_process.terminate()
+    # ocr_process.wait()
     print("Server stopped.")
 
 if __name__ == "__main__":

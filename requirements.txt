@@ -1,0 +1,11 @@
+flask
+openpyxl
+requests
+mammoth
+markdownify
+google-genai
+python-dotenv
+pytesseract
+pillow
+opencv-python-headless
+scikit-learn

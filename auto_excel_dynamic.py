@@ -368,13 +368,12 @@ def process_image(image_path, target_xlsx=None, sheet_name=None, raw_ocr_data=No
             enhanced_path = os.path.join(os.path.dirname(image_path), "temp_enhanced_ocr.png")
             img_enh.save(enhanced_path)
             
-            ocr_bin = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ocr")
-            if not os.path.exists(ocr_bin):
-                ocr_bin = "./ocr"
-                
-            # Run OCR on both
-            res_unenhanced = subprocess.run([ocr_bin, unenhanced_path], capture_output=True, text=True)
-            res_enhanced = subprocess.run([ocr_bin, enhanced_path], capture_output=True, text=True)
+            # Cloud Compatible OCR (Tesseract)
+            import subprocess
+            handler_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tesseract_ocr_handler.py")
+            
+            res_unenhanced = subprocess.run(["python3", handler_script, unenhanced_path], capture_output=True, text=True)
+            res_enhanced = subprocess.run(["python3", handler_script, enhanced_path], capture_output=True, text=True)
             
             raw_ocr_data = json.loads(res_unenhanced.stdout)
             enhanced_data = json.loads(res_enhanced.stdout)
