@@ -1,7 +1,8 @@
 FROM python:3.10-slim
 
 # Install system dependencies (Tesseract OCR, OpenCV dependencies)
-RUN apt-get update && apt-get install -y \
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
     tesseract-ocr \
     tesseract-ocr-tur \
     libgl1-mesa-glx \
